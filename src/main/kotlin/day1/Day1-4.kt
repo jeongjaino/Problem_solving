@@ -2,28 +2,21 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 
 fun main(){
+
     val br = BufferedReader(InputStreamReader(System.`in`))
+
     val num = br.readLine().toInt()
-    val coinList = mutableListOf<Int>()
-    br.readLine().split(" ").forEach{
-        coinList.add(it.toInt())
-    }
-    coinList.sortDescending()
-    repeat(coinList.first() * num){  // 양의 정수를 찾는 반복
-        for(i in 1 until coinList.size) {
-            var resultNum = it
-            for (j in i until coinList.size) {
-                if (resultNum >= coinList[j]) { // 현재 수가 양의 정수 보다 이하일 때
-                    resultNum -= coinList[j]
-                }
-            }
-            if(resultNum == 0){
-                break
-            }
-            if(i == coinList.size - 1){
-                print(it)
-                return
-            }
+    val coinList = br.readLine().split(" ").map{ it.toInt() }.sorted()
+    var target = 1
+
+    // 현재 얻은 화폐의 합까지 모두 만들 수 있다고 가정,
+    // 만약 모든 합 target 보다 다음 숫자가 큰 경우
+    for(coin in  coinList) {
+        if(target < coin) {
+            break
+        }else {
+            target += coin
         }
     }
+    print(target)
 }
