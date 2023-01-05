@@ -4,15 +4,11 @@ import java.io.InputStreamReader
 fun main(){
 
     val br = BufferedReader(InputStreamReader(System.`in`))
-    val numList = br.readLine().trim()
-    val num = mutableListOf<Int>()
-    numList.forEach {
-        num.add(it.digitToInt())
-    }
 
-    var previous = num[1]
-    var zeroCount = 0
-    var oneCount = 0
+    val numList = br.readLine().map{ it.digitToInt() }
+    var previous = numList[0]
+    var zeroCount = 0 // 0의 개수
+    var oneCount = 0 // 1의 개수
 
     // 구간이 몇개 있는지를 확인
     if(previous == 0){
@@ -20,8 +16,8 @@ fun main(){
     }else{
         oneCount += 1
     }
-    for(i in 2 until num.size - 1){
-        if(num[i] != previous){
+    for(i in 1 until numList.size){
+        if(numList[i] != previous){ // 이전 숫자와 현재 숫자가 다른 경우
             if(previous == 0){
                 oneCount += 1
                 previous = 1
@@ -31,11 +27,5 @@ fun main(){
             }
         }
     }
-
-    // 0인 경우의 수
-    if(num.count{ it == 0} < num.count{ it == 1}){
-        print(zeroCount)
-    }else{
-        print(oneCount)
-    }
+    if(zeroCount < oneCount) print(zeroCount) else print(oneCount)
 }
