@@ -10,7 +10,7 @@ private var result = 0
 private lateinit var map : Array<IntArray>
 private val viruses : MutableList<Pair<Int, Int>> = mutableListOf()
 
-fun main(){
+private fun main(){
     val br = BufferedReader(InputStreamReader(System.`in`))
     var stk = StringTokenizer(br.readLine())
     n = stk.nextToken().toInt()
