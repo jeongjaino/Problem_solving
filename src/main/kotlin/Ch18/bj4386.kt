@@ -41,13 +41,13 @@ fun getDistance(i : Pair<Double, Double>, j : Pair<Double, Double>): Double{
     return floor(hypot((i.first - j.first), (i.second - j.second)) * 100 ) / 100
 }
 
-fun findParent(x : Int) : Int{
+private fun findParent(x : Int) : Int{
     if(parent[x] == x) return x
     parent[x] = findParent(parent[x])
     return parent[x]
 }
 
-fun union(a : Int, b: Int) {
+private fun union(a : Int, b: Int) {
     val A = findParent(a)
     val B = findParent(b)
     if (A == B) return
