@@ -4,24 +4,38 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.*
 
-private lateinit var result : IntArray
+private lateinit var graph : Array<MutableList<Pair<Int, Int>>>
+private lateinit var reverseGraph : Array<MutableList<Pair<Int, Int>>>
+private var n = 0
+private var x = 0
 
-// 다른 마을에서 x 마을까지 최단 거리 + x 마을에서 다른 마을까지 최단 거리
 fun main(){
     val br = BufferedReader(InputStreamReader(System.`in`))
-    val (n, m, x) = br.readLine().split(" ").map{ it.toInt() }
-    val graph = Array(n+1){ mutableListOf<Pair<Int, Int>>() }
-    result = IntArray(n + 1)
+    val stk = StringTokenizer(br.readLine())
+    n = stk.nextToken().toInt()
+    val m = stk.nextToken().toInt()
+    x = stk.nextToken().toInt()
+    graph = Array(n + 1){ mutableListOf() }
+    reverseGraph = Array(n + 1){ mutableListOf() }
 
-    // 그래프 입력
     repeat(m){
         val (a, b, c) = br.readLine().split(" ").map{ it.toInt() }
-        graph[a].add(Pair(b, c))
+        graph[a].add(Pair(b, c)) // 정방향 그래프
+        reverseGraph[b].add(Pair(a, c)) // 역방향 그래프
     }
+    val distance1 = dijkstra(graph) // x 마을에서 다른 노드까지의 거리
+    val distance2 = dijkstra(reverseGraph) // 다른 노드에서 x 마을까지 거리
 
-    val distance = (0..n).map{ Int.MAX_VALUE }.toMutableList()
+    var result = 0
+    for(i in 1 .. n){
+        result = maxOf(result, distance1[i] + distance2[i])
+    }
+    print(result)
+}
 
-    // 간선 값으로 정렬된 우선순위 큐
+fun dijkstra(graph: Array<MutableList<Pair<Int, Int>>>): IntArray{
+    val distance = IntArray(n + 1){ Int.MAX_VALUE }
+    val visited = BooleanArray(n + 1)
     val q = PriorityQueue<Pair<Int, Int>>{ p1, p2 ->
         when {
             p1.second > p2.second -> 1
@@ -29,64 +43,16 @@ fun main(){
             else -> 0
         }
     }
-
-    q.add(Pair(x, 0)) // 시작 마을, 간선 값 0
+    q.add(Pair(x, 0))
     distance[x] = 0
 
     while(q.isNotEmpty()){
-        val (now, dist) = q.poll() // 최단거리가 가장 짧은 값 꺼내기
-
-        if (distance[now] < dist) // 처리된 값이면 무시
-            continue
-
-        for(i in graph[now]){
-            val cost = dist + i.second
-            if(cost < distance[i.first]){ // 거치는 값이 더 작은 경우
-                distance[i.first] = cost
-                q.add(Pair(i.first, cost))
-            }
-        }
-    }
-
-    distance.forEachIndexed { index, value ->
-        if(value != Int.MAX_VALUE){
-            result[index] += value
-        }
-    }
-
-    var max = - 1
-    for(i in 1 .. n){
-        val temp = dijkstra(i, graph, n, x)
-        if(temp != Int.MAX_VALUE){
-            result[i] += temp
-            max = maxOf(max, result[i])
-        }
-    }
-    print(max)
-}
-
-// 모든 마을에서 x 마을까지 거리
-fun dijkstra(start: Int, graph: Array<MutableList<Pair<Int, Int>>>, n : Int, x: Int): Int{
-    val distance = (0..n).map{ Int.MAX_VALUE }.toMutableList()
-
-    val q = PriorityQueue<Pair<Int, Int>>{ p1, p2 ->
-        when {
-            p1.second > p2.second -> 1
-            p1.second < p2.second -> -1
-            else -> 0
-        }
-    }
-
-    q.add(Pair(start, 0))
-    distance[start] = 0
-
-    while(q.isNotEmpty()){
         val (now, dist) = q.poll()
-        if(now == x){
-            return dist
-        }
-        if(distance[now] < dist)
+
+        if(visited[now])
             continue
+        visited[now] = true
+
         for(i in graph[now]){
             val cost = dist + i.second
             if(cost < distance[i.first]){
@@ -95,5 +61,5 @@ fun dijkstra(start: Int, graph: Array<MutableList<Pair<Int, Int>>>, n : Int, x: 
             }
         }
     }
-    return Int.MAX_VALUE // 갈수 없는 경우
+    return distance
 }
